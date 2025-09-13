@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../models/chat_message.dart';
@@ -474,9 +475,15 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          _geminiRating!,
-                          style: const TextStyle(fontSize: 14),
+                        MarkdownBody(
+                          data: _geminiRating!,
+                          styleSheet: MarkdownStyleSheet(
+                            p: const TextStyle(fontSize: 14),
+                            strong: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
