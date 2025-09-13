@@ -4,8 +4,20 @@ import 'package:rizz_rater/pages/home_page.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");  // Load API key
-  Gemini.init(apiKey: dotenv.env['GEMINI_API_KEY']!);
+  WidgetsFlutterBinding.ensureInitialized(); // Required before async calls
+  try {
+    await dotenv.load(fileName: ".env");  // Load API key
+  } catch (e) {
+    print("Warning: .env file not found, make sure GEMINI_API_KEY is set!");
+  }
+
+  final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
+  if (apiKey.isEmpty) {
+    print("Error: GEMINI_API_KEY not found. Gemini will not work.");
+  } else {
+    Gemini.init(apiKey: apiKey);
+  }
+
   runApp(const MyApp());
 }
 
