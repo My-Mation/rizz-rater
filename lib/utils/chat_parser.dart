@@ -9,8 +9,16 @@ import '../models/chat_message.dart';
 List<ChatMessage> parseWhatsAppExport(String raw) {
   if (raw.isEmpty) return [];
 
+  // Clean the text: replace special Unicode spaces with normal spaces
+  raw = raw.replaceAll('\u202F', ' ').replaceAll('\u00A0', ' ');
+
+  // Remove BOM if still present
+  if (raw.startsWith('\uFEFF')) {
+    raw = raw.substring(1);
+  }
+
   // Normalize newlines
-  final normalized = raw.replaceAll('\r\n', '\n');
+  final normalized = raw.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
 
   // Regex to detect the beginning of a new message:
   // - date: dd/mm/yyyy or d-m-yy etc (flexible)

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,6 +8,17 @@ import 'package:device_info_plus/device_info_plus.dart';
 import '../models/chat_message.dart';
 import '../utils/chat_parser.dart';
 import '../services/gemini_service.dart';
+import 'onboarding_page.dart';
+
+/// Decode bytes with BOM handling for UTF-8
+String decodeTextFile(List<int> bytes) {
+  String text = utf8.decode(bytes, allowMalformed: true);
+  // Remove BOM if present (UTF-8 BOM is \uFEFF)
+  if (text.startsWith('\uFEFF')) {
+    text = text.substring(1);
+  }
+  return text;
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -109,7 +121,7 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      final content = String.fromCharCodes(txtFile.content as List<int>);
+      final content = decodeTextFile(txtFile.content as List<int>);
       
       // Parse WhatsApp chat export
       final parsedMessages = parseWhatsAppExport(content);
@@ -262,32 +274,40 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('WhatsApp Chat Reader'),
-        backgroundColor: Colors.green[700],
-        foregroundColor: Colors.white,
+        title: const Text('Rizz Rater'),
+        backgroundColor: const Color(0xFF1E3A5F), // Subtle dark blue
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      body: Container(
+        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/backgroundofrizz.png'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Color(0x80000000), BlendMode.multiply),
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Privacy Warning
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange[100],
+                color: const Color(0xFF00E5FF).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange[300]!),
+                border: const Border.fromBorderSide(BorderSide(color: Color(0xFF00E5FF))),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning, color: Colors.orange[700]),
+                  const Icon(Icons.warning, color: Color(0xFF00E5FF)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Privacy Notice: Chat data is processed locally only. Never upload sensitive chats to public servers.',
-                      style: TextStyle(
-                        color: Colors.orange[700],
+                      'insert funny text here',
+                      style: const TextStyle(
+                        color: Color(0xFF00E5FF),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -297,7 +317,28 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
+            // Tutorial Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const OnboardingPage()),
+                  );
+                },
+                icon: const Icon(Icons.school),
+                label: const Text('How to Use (Tutorial)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Upload Button
             SizedBox(
               width: double.infinity,
@@ -306,12 +347,13 @@ class _HomePageState extends State<HomePage> {
                 icon: const Icon(Icons.upload_file),
                 label: const Text('Upload ZIP File'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[600],
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
             
             if (_isLoading)
@@ -322,12 +364,12 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.file_present, color: Colors.green[600]),
+                      Icon(Icons.file_present, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -346,18 +388,18 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red[100],
+                    color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red[300]!),
+                    border: Border.all(color: Theme.of(context).colorScheme.error),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error, color: Colors.red[700]),
+                      Icon(Icons.error, color: Theme.of(context).colorScheme.error),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _errorMessage!,
-                          style: TextStyle(color: Colors.red[700]),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                     ],
@@ -378,19 +420,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const Spacer(),
-                    Row(
-                      children: [
-                        const Text('Show system messages'),
-                        Switch(
-                          value: _showSystemMessages,
-                          onChanged: (value) {
-                            setState(() {
-                              _showSystemMessages = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -400,7 +429,7 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: _isRatingLoading ? null : _rateChatWithGemini,
-                    icon: _isRatingLoading 
+                    icon: _isRatingLoading
                         ? const SizedBox(
                             width: 16,
                             height: 16,
@@ -409,8 +438,8 @@ class _HomePageState extends State<HomePage> {
                         : const Icon(Icons.psychology),
                     label: Text(_isRatingLoading ? 'Analyzing...' : 'Rate Chat with AI'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[600],
-                      foregroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      foregroundColor: Theme.of(context).colorScheme.onSecondary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -422,23 +451,23 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.purple[50],
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.purple[200]!),
+                      border: Border.all(color: Theme.of(context).colorScheme.secondary),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.psychology, color: Colors.purple[700]),
+                            Icon(Icons.psychology, color: Theme.of(context).colorScheme.secondary),
                             const SizedBox(width: 8),
                             Text(
                               'AI Chat Analysis',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.purple[700],
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
 
                             ),
@@ -455,40 +484,40 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 10),
                 ],
                 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _chatMessages.length,
-                    itemBuilder: (context, index) {
-                      final message = _chatMessages[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              message.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green[700],
-                                fontSize: 14,
-                              ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _chatMessages.length,
+                  itemBuilder: (context, index) {
+                    final message = _chatMessages[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.secondary),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            message.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 14,
                             ),
-                            const SizedBox(height: 4),
-                Text(
-                              message.text,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            message.text,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
               
@@ -498,16 +527,17 @@ class _HomePageState extends State<HomePage> {
                   'Raw Text (No WhatsApp format detected):',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              const SizedBox(height: 10),
-                Expanded(
+                const SizedBox(height: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 400),
                   child: SingleChildScrollView(
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                    child: Text(
+                      child: Text(
                         _extractedText!,
                         style: const TextStyle(fontFamily: 'monospace'),
                       ),
@@ -516,10 +546,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ],
+            const SizedBox(height: 20), // Space at bottom
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }
-

@@ -8,7 +8,7 @@ import 'package:rizz_rater/main.dart';
 void main() {
   testWidgets('WhatsApp Chat Reader app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyApp(seenTutorial: true));
 
     // Verify that the app title is displayed.
     expect(find.text('WhatsApp Chat Reader'), findsOneWidget);
