@@ -14,6 +14,7 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IntroductionScreen(
+      controlsMargin: const EdgeInsets.only(bottom: 15.0),
       pages: [
         PageViewModel(
           title: "Upload Chats",
