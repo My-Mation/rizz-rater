@@ -440,6 +440,7 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.purple[700],
                               ),
+
                             ),
                           ],
                         ),
@@ -521,3 +522,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

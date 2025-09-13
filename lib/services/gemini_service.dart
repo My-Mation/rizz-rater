@@ -46,26 +46,7 @@ class GeminiService {
           {
             'parts': [
               {
-                'text': '''You are given the extracted contents of a WhatsApp chat. 
-The format is:
-[Name]: [Message]
-
-Ignore any dates, times, media placeholders, or system messages. 
-Focus only on the actual conversation between people.
-
-Your task:
-1. Rate the overall tone of the chat (positive, neutral, negative, mixed).
-2. Analyze clarity and readability of the messages.
-3. Evaluate friendliness and emotional warmth.
-4. Assess engagement level (are both sides equally active, or one dominates?).
-5. Provide a final detailed rating (0–10) with reasoning.
-
-Give a short structured report with sections:
-- Tone
-- Clarity
-- Friendliness
-- Engagement
-- Final Rating with explanation
+                'text': '''You are a social intelligence and friendship analyst. Read the chat conversation provided and give a very detailed, human-readable analysis from start to finish. Focus on the quality of interaction, not grammar or spelling. Analyze the conversation thoroughly for engagement, emotional tone, hidden meanings, mutual bond, and relationship dynamics. For each message or group of messages, describe how actively each participant engages, who drives the conversation, who responds thoughtfully, who is passive, and provide examples from the chat. Evaluate the strength of the friendship, noting trust, support, care, teasing, comfort, and closeness. Identify emotions expressed or implied in each message, including subtle ones like hidden regret, jealousy, encouragement, hidden concern, excitement, or frustration. Detect subtext, double meanings, or indirect messages. Note behavior patterns, such as who frequently initiates conversation, who encourages the other, who jokes or teases, and any changes over time. Highlight specific messages that stand out and explain why they are significant in understanding the relationship or engagement quality. Summarize the overall dynamics, strengths, weaknesses, and key insights about the friendship. Mention participants by name when possible. Cover everything in detail from beginning to end. Provide a continuous, thorough narrative. Nothing is too small to include. Analyze phrasing, timing, tone, and responses to reveal the true nature of the relationship. Consider context, implied intentions, and consistency of behavior. Give examples to support each point. Focus on engagement, emotional depth, hidden meanings, relational closeness, and overall quality of communication.
 
 Chat content:
 $chatText'''
@@ -77,7 +58,7 @@ $chatText'''
           'temperature': 0.7,
           'topK': 40,
           'topP': 0.95,
-          'maxOutputTokens': 1024,
+          'maxOutputTokens': 2048,
         }
       };
 
