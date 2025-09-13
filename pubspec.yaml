@@ -39,6 +39,7 @@ dependencies:
   dash_chat_2: ^0.0.21
   file_picker: ^10.3.3
   archive: ^4.0.7
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
