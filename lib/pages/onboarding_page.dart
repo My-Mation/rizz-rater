@@ -24,12 +24,12 @@ class OnboardingPage extends StatelessWidget {
         PageViewModel(
           title: "Upload Chats",
           body: "Click 'More' (three dots) and select 'Export chat'.",
-          image: const Icon(Icons.upload_file, size: 100, color: Colors.blue),
+          image: const Icon(Icons.upload_file, size: 100, color: Colors.pink),
         ),
         PageViewModel(
           title: "Upload Chats",
           body: "Click export without media and upload the zip file here.",
-          image: const Icon(Icons.upload_file, size: 100, color: Colors.blue),
+          image: const Icon(Icons.upload_file, size: 100, color: Colors.grey),
         ),
         PageViewModel(
           title: "AI Analysis",
