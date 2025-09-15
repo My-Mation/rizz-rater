@@ -340,21 +340,6 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 16),
 
-            // Upload Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _pickAndProcessZip,
-                icon: const Icon(Icons.upload_file),
-                label: const Text('Upload ZIP File'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-
             const SizedBox(height: 20),
             
             if (_isLoading)
@@ -423,29 +408,6 @@ class _HomePageState extends State<HomePage> {
                     const Spacer(),
                   ],
                 ),
-                const SizedBox(height: 10),
-                
-                // AI Rating Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _isRatingLoading ? null : _rateChatWithGemini,
-                    icon: _isRatingLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.psychology),
-                    label: Text(_isRatingLoading ? 'Analyzing...' : 'Rate Chat with AI'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 
                 // AI Rating Display
                 if (_geminiRating != null) ...[
@@ -490,7 +452,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 10),
                 ],
-                
+                // Toggle System Messages
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
