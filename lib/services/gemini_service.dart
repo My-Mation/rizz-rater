@@ -17,34 +17,60 @@ class GeminiService {
   /// In development: loads from .env file
   /// In production: loads from secure storage
   static Future<void> initialize() async {
+    _safeLog('Initializing Gemini Service...');
     try {
       if (kReleaseMode) {
-        // Production: Load from secure storage
+        _safeLog('In production mode, loading API key from secure storage...');
         _apiKey = await _secureStorage.read(key: 'GEMINI_API_KEY');
-        if (_apiKey == null || _apiKey!.isEmpty) {
-          // If not in secure storage, try .env as fallback (for first run)
-          await dotenv.load();
-          _apiKey = dotenv.env['GEMINI_API_KEY'];
-          if (_apiKey != null && _apiKey!.isNotEmpty) {
-            // Store in secure storage for future use
-            await _secureStorage.write(key: 'GEMINI_API_KEY', value: _apiKey);
+        if (_apiKey != null && _apiKey!.isNotEmpty) {
+          _safeLog('API key loaded successfully from secure storage.');
+        } else {
+          _safeLog(
+              'API key not found in secure storage, attempting to load from .env as a fallback.');
+          try {
+            await dotenv.load();
+            _apiKey = dotenv.env['GEMINI_API_KEY'];
+            if (_apiKey != null && _apiKey!.isNotEmpty) {
+              _safeLog('API key loaded from .env and will be stored securely.');
+              await _secureStorage.write(key: 'GEMINI_API_KEY', value: _apiKey);
+            } else {
+              _safeLog('API key not found in .env file.');
+            }
+          } catch (e) {
+            _safeLog('Could not load .env file: ${e.toString()}');
           }
         }
       } else {
-        // Development: Load from .env file
-        _apiKey = dotenv.env['GEMINI_API_KEY'];
+        _safeLog('In development mode, loading API key from .env file...');
+        try {
+          await dotenv.load();
+          _apiKey = dotenv.env['GEMINI_API_KEY'];
+          if (_apiKey != null && _apiKey!.isNotEmpty) {
+            _safeLog('API key loaded successfully from .env file.');
+          } else {
+            _safeLog('API key not found in .env file.');
+          }
+        } catch (e) {
+          _safeLog('Could not load .env file: ${e.toString()}');
+        }
       }
 
       if (_apiKey == null || _apiKey!.isEmpty) {
+        _safeLog('Initialization failed: API key is missing.');
         throw Exception(GeminiConfig.apiKeyErrorMessage);
+      } else {
+        _safeLog('Gemini Service initialized successfully.');
       }
     } catch (e) {
       if (e.toString().contains('NotInitializedError')) {
+        _safeLog('Dotenv not initialized. Ensure you have a .env file.');
         throw Exception(GeminiConfig.apiKeyErrorMessage);
       }
+      _safeLog('An unexpected error occurred during initialization: ${e.toString()}');
       rethrow;
     }
   }
+
 
   /// Set the model to use (only supported models allowed)
   static void setModel(String model) {
