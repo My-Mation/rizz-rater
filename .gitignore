@@ -1,1 +1,46 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swid
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+*.swo
+*.swp
+*.suo
+*.user
+*.bak
+*.idea
+.vscode/
+
+# Flutter/Dart
+/build/
+/.dart_tool/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# Mobile
+/ios/Pods/
+/ios/Flutter/App.framework
+/ios/Flutter/engine.xcframework
+/ios/Flutter/flutter_export_environment.sh
+/ios/Runner.xcworkspace/
+/ios/Runner.xcodeproj/project.xcworkspace/
+/ios/Runner.xcodeproj/xcuserdata/
+/ios/.symlinks/
+/android/app/src/main/assets/flutter_assets/
+/android/.gradle/
+/android/local.properties
+/android/key.properties
+/android/app/build/
+/android/app/release/
+/android/app/profile/
+
+# Environment variables
 .env
