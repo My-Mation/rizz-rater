@@ -9,6 +9,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import '../models/chat_message.dart';
 import '../utils/chat_parser.dart';
 import '../services/gemini_service.dart';
+import '../consts.dart';
 import 'onboarding_page.dart';
 
 /// Decode bytes with BOM handling for UTF-8
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   String? _errorMessage;
   String? _geminiRating;
   bool _isRatingLoading = false;
+  String _selectedModel = GeminiConfig.defaultModel;
 
   Future<void> _pickAndProcessZip() async {
     setState(() {
@@ -255,13 +257,16 @@ class _HomePageState extends State<HomePage> {
           .join('\n');
 
       final rating = await GeminiService.rateChat(chatText);
-      
+
       setState(() {
         _geminiRating = rating;
+        _errorMessage = null; // Clear any previous errors
       });
     } catch (e) {
+      // The service now returns safe error messages, so we can display them directly
       setState(() {
-        _errorMessage = 'Error getting AI rating: ${e.toString()}';
+        _errorMessage = e.toString();
+        _geminiRating = null;
       });
     } finally {
       setState(() {
@@ -319,6 +324,66 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 16),
 
+            // Model Selection
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AI Model',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _selectedModel,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.surface,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: GeminiConfig.defaultModel,
+                        child: Text(
+                          'Gemini 1.5 Pro (Best for analysis)',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: GeminiConfig.fallbackModel,
+                        child: Text(
+                          'Gemini 1.5 Flash (Faster, cheaper)',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedModel = value;
+                        });
+                        GeminiService.setModel(value);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Tutorial Button
             SizedBox(
               width: double.infinity,
@@ -340,6 +405,40 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 16),
 
+            // Upload Chat Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _pickAndProcessZip,
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Upload Chat (ZIP)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Rate Chat Button
+            if (!_isRatingLoading) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _rateChatWithGemini,
+                  icon: const Icon(Icons.psychology),
+                  label: const Text('Rate Chat with AI'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ] else ...[
+              const Center(child: CircularProgressIndicator()),
+            ],
             const SizedBox(height: 20),
             
             if (_isLoading)

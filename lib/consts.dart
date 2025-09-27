@@ -18,4 +18,22 @@ class AppColors {
 
   // Optional Accent / Highlights
   static const Color highlightCyan = Color(0xFF00E5FF); // Neon cyan for small attention areas
-}
+  }
+  
+  // Gemini API Configuration
+  class GeminiConfig {
+    // Supported models (only these are allowed)
+    static const String defaultModel = 'gemini-1.5-pro-latest';
+    static const String fallbackModel = 'gemini-1.5-flash-latest';
+  
+    // API limits
+    static const int maxChatLength = 100000; // ~100k characters (well under token limits)
+    static const Duration requestTimeout = Duration(seconds: 30);
+  
+    // Safe fallback messages
+    static const String networkErrorMessage = 'Couldn\'t analyze chat right now. Please check your internet or try again later.';
+    static const String apiKeyErrorMessage = 'API key configuration error. Please check your .env file.';
+    static const String quotaErrorMessage = 'Free quota exhausted or billing not set up. Please enable billing in Google AI Studio.';
+    static const String invalidResponseMessage = 'No valid analysis was returned from the model.';
+    static const String genericErrorMessage = 'Chat analysis could not be completed. Please try again later.';
+  }
