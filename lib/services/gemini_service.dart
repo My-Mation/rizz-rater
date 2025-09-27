@@ -149,7 +149,7 @@ $chatText''',
       if (response.statusCode == 200) {
         return _parseSuccessfulResponse(response.body);
       } else {
-        return _handleApiError(response);
+        throw Exception(_handleApiError(response));
       }
     } on TimeoutException {
       _safeLog('Request timeout for model $modelName');
@@ -197,6 +197,9 @@ $chatText''',
       final errorMessage =
           errorData['error']?['message'] ?? 'Unknown API error';
 
+      // Log the actual error for debugging
+      _safeLog('API Error (${response.statusCode}): $errorMessage');
+
       // Handle specific error codes
       if (response.statusCode == 403 || response.statusCode == 429) {
         return GeminiConfig.quotaErrorMessage;
@@ -206,8 +209,8 @@ $chatText''',
       } else if (response.statusCode >= 500) {
         return GeminiConfig.networkErrorMessage;
       } else {
-        _safeLog('API error (${response.statusCode}): $errorMessage');
-        return GeminiConfig.genericErrorMessage;
+        // For other errors, return the specific message from the API
+        return 'Chat analysis failed: $errorMessage';
       }
     } catch (e) {
       _safeLog('Failed to parse error response: ${e.toString()}');
