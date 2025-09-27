@@ -28,7 +28,7 @@ class AppColors {
   
     // API limits
     static const int maxChatLength = 100000; // ~100k characters (well under token limits)
-    static const Duration requestTimeout = Duration(seconds: 30);
+    static const Duration requestTimeout = Duration(seconds: 60);
   
     // Safe fallback messages
     static const String networkErrorMessage = 'Couldn\'t analyze chat right now. Please check your internet or try again later.';
