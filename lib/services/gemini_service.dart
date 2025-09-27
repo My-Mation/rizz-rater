@@ -73,7 +73,7 @@ class GeminiService {
 
     // Truncate if too long
     String processedText = chatText.length > GeminiConfig.maxChatLength
-        ? chatText.substring(0, GeminiConfig.maxChatLength) + '...[truncated]'
+        ? '${chatText.substring(0, GeminiConfig.maxChatLength)}...[truncated]'
         : chatText;
 
     // Initialize if needed

@@ -114,7 +114,7 @@ List<ChatMessage> parseWhatsAppExport(String raw) {
         
         // Skip lines that look like they could be malformed messages
         // (lines that don't look like natural message continuations)
-        if (trimmed.length > 0 && 
+        if (trimmed.isNotEmpty && 
             !trimmed.startsWith(' ') && 
             !trimmed.startsWith('\t') &&
             !RegExp(r'^[a-zA-Z0-9\s\.,!?\-_]+$').hasMatch(trimmed)) {
@@ -124,7 +124,7 @@ List<ChatMessage> parseWhatsAppExport(String raw) {
         
         // Skip lines that look like they could be malformed message starts
         // (lines that don't start with whitespace and look like they could be message starts)
-        if (trimmed.length > 0 && 
+        if (trimmed.isNotEmpty && 
             !trimmed.startsWith(' ') && 
             !trimmed.startsWith('\t') &&
             (trimmed == 'Another malformed line' || trimmed == 'This is not a proper message line')) {

@@ -9,23 +9,27 @@ import 'package:rizz_rater/services/gemini_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  String? geminiInitError;
   try {
     await dotenv.load(fileName: ".env");
     await GeminiService.initialize();
     print("Gemini service initialized successfully");
   } catch (e) {
-    print("Warning: Failed to initialize Gemini service: $e");
+    geminiInitError = e.toString();
+    print("Failed to initialize Gemini service: $e");
   }
 
   final prefs = await SharedPreferences.getInstance();
   final seenTutorial = prefs.getBool("seenTutorial") ?? false;
 
-  runApp(MyApp(seenTutorial: seenTutorial));
+  runApp(MyApp(seenTutorial: seenTutorial, geminiInitializationError: geminiInitError));
 }
 
 class MyApp extends StatelessWidget {
   final bool seenTutorial;
-  const MyApp({super.key, required this.seenTutorial});
+  final String? geminiInitializationError;
+
+  const MyApp({super.key, required this.seenTutorial, this.geminiInitializationError});
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +42,17 @@ class MyApp extends StatelessWidget {
           primary: Color(0xFF2979FF),
           secondary: Color(0xFF90A4AE),
           surface: Color(0xFF1E1E1E),
-          background: Color(0xFF121212),
           onPrimary: Colors.white,
           onSecondary: Colors.white,
           onSurface: Colors.white,
-          onBackground: Colors.white,
         ),
         scaffoldBackgroundColor: const Color(0xFF121212),
       ),
       home: AnimatedSplashScreen(
         splash: Image.asset('assets/Splash_screen.gif'),
-        nextScreen: seenTutorial ? const HomePage() : const OnboardingPage(),
+        nextScreen: seenTutorial
+            ? HomePage(geminiInitializationError: geminiInitializationError)
+            : const OnboardingPage(),
         splashTransition: SplashTransition.fadeTransition,
         backgroundColor: const Color(0xFF0D1117),
         duration: 3000,

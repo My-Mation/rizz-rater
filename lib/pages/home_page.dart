@@ -23,7 +23,8 @@ String decodeTextFile(List<int> bytes) {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String? geminiInitializationError;
+  const HomePage({super.key, this.geminiInitializationError});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -34,11 +35,39 @@ class _HomePageState extends State<HomePage> {
   String? _extractedText;
   List<ChatMessage> _chatMessages = [];
   bool _isLoading = false;
-  bool _showSystemMessages = false;
+  final bool _showSystemMessages = false;
   String? _errorMessage;
   String? _geminiRating;
   bool _isRatingLoading = false;
   String _selectedModel = GeminiConfig.defaultModel;
+  bool _isGeminiInitialized = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.geminiInitializationError != null) {
+      _isGeminiInitialized = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showInitializationErrorDialog(widget.geminiInitializationError!);
+      });
+    }
+  }
+
+  void _showInitializationErrorDialog(String error) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('API Key Error'),
+        content: Text(error),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _pickAndProcessZip() async {
     setState(() {
@@ -237,6 +266,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _rateChatWithGemini() async {
+    if (!_isGeminiInitialized) {
+       _showInitializationErrorDialog(widget.geminiInitializationError!);
+       return;
+    }
+
     if (_chatMessages.isEmpty) {
       setState(() {
         _errorMessage = 'Please upload and parse a chat first.';
@@ -345,7 +379,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: _selectedModel,
+                    initialValue: _selectedModel,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       border: OutlineInputBorder(
@@ -370,14 +404,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ],
-                    onChanged: (value) {
+                    onChanged: _isGeminiInitialized ? (value) {
                       if (value != null) {
                         setState(() {
                           _selectedModel = value;
                         });
                         GeminiService.setModel(value);
                       }
-                    },
+                    } : null,
                   ),
                 ],
               ),
@@ -430,7 +464,7 @@ class _HomePageState extends State<HomePage> {
                   icon: const Icon(Icons.psychology),
                   label: const Text('Rate Chat with AI'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    backgroundColor: _isGeminiInitialized ? Theme.of(context).colorScheme.secondary : Colors.grey,
                     foregroundColor: Theme.of(context).colorScheme.onSecondary,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),

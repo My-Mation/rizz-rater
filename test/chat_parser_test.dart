@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rizz_rater/utils/chat_parser.dart';
-import 'package:rizz_rater/models/chat_message.dart';
 
 void main() {
   group('WhatsApp Chat Parser Tests', () {
